@@ -6,7 +6,7 @@
 #define TOGGLE_ROCKETS 10   // Let the rocket leds shine
 #define BLINKING_ROCKETS 0 // Let the rocket leds blink
 
-#include "../ext/card10/epicardium.h"
+#include <epicardium.h>
 
 #include "FreeRTOS.h"
 #include <types.h>
