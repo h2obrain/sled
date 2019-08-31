@@ -166,7 +166,7 @@ int modloader_loadgfx() {
 		// Bring GFX modules into rotation (see mod.h for details on this field)
 		module *mod = mod_get(i);
 		if (strcmp(mod->type, "gfx")==0) {
-			slogn(10,"%s (mid:%d ld:%d) has rotation privs\n", mod->name, i, ld);
+			slogn(20,"%s (mid:%d ld:%d) has rotation privs\n", mod->name, i, ld);
 			asl_growiv(&modloader_gfx_rotation, i);
 		}
 	}
@@ -190,7 +190,7 @@ int modloader_initgfx(int mid) {
 int modloader_deinitgfx(int mid) {
 	module * mod = mod_get(mid);
 	if (!mod->is_valid_drawable) return 0;
-	slogn(10,"deinitializing %s\n", mod->name);
+	slogn(10,"deinitializing '%s'\n", mod->name);
 	mod->deinit(mid);
 	mod->is_valid_drawable = 0;
 	int ret = asl_deliv(&modloader_gfx_inited, mid);

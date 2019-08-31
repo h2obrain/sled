@@ -47,24 +47,24 @@ static int ci_iteration_count = 0;
 #endif
 
 static int deinit(void) {
-	slogn(10,"Cleaning up GFX/BGM modules...");
+	slogn(9,"Cleaning up GFX/BGM modules...");
 	int ret;
 	modloader_unloadgfx();
-	slogn(10," Done!\nCleaning up output module interface...");
+	slogn(9," Done!\nCleaning up output module interface...");
 	if ((ret = matrix_deinit()) != 0)
 		return ret;
 	if ((ret = timers_deinit()) != 0)
 		return ret;
-	slogn(10," Done!\nCleaning up output module and filters...");
+	slogn(9," Done!\nCleaning up output module and filters...");
 	modloader_deinitend();
-	slogn(10," Done!\nCleaning up bits and pieces...");
+	slogn(9," Done!\nCleaning up bits and pieces...");
 	oscore_mutex_free(rmod_lock);
 	if (main_rmod_override != -1)
 		asl_clearav(&main_rmod_override_args);
 	if (modloader_modpath != default_moduledir) free(modloader_modpath);
 	modloader_modpath = NULL;
 
-	slogn(10," Done!\nCleaning up Taskpool...");
+	slogn(9," Done!\nCleaning up Taskpool...");
 	taskpool_forloop_free();
 	taskpool_destroy(TP_GLOBAL);
 
@@ -83,7 +83,7 @@ static int pick_next_random(int current_modno, oscore_time in) {
 	} else {
 		for (int i = 0; i < 2; i++) {
 			next_mod = modloader_gfx_rotation.argv[rand() % modloader_gfx_rotation.argc];
-			slogn(100,"Randomly selected modno:%d\n", next_mod);
+			slogn(10,"Randomly selected modno:%d\n", next_mod);
 			if (next_mod != current_modno)
 				break;
 		}
@@ -342,7 +342,7 @@ int sled_main(int argc, char** argv) {
 		} else
 		if (tnext.time > timers_wait_until(tnext.time)) {
 		//if (timers_wait_until(tnext.time) == 1) {
-			slogn(10,">> Early break\n");
+			slogn(9,">> Early break\n");
 			// Early break (wait was interrupted). Set this timer up for elimination by any 0-time timers that have come along
 			if (tnext.time == 0) tnext.time = 1;
 			timer_add(tnext.time, tnext.moduleno, tnext.args.argc, tnext.args.argv);
@@ -351,6 +351,7 @@ int sled_main(int argc, char** argv) {
 			assert(tnext.moduleno < mod_count());
 			module* mod = mod_get(tnext.moduleno);
 			if ((tnext.moduleno != lastmod)||(!mod->is_valid_drawable)) {
+				slogn(10,">> Lastmod %d\n", lastmod);
 				if (lastmod >= 0) {
 					modloader_deinitgfx(lastmod);
 					lastmod = -1;
@@ -364,13 +365,13 @@ int sled_main(int argc, char** argv) {
 				}
 				// remove this? it's called from most init functions, I think
 				if (mod->reset) {
-					slogn(10,">> Resetting..\n");
+					slogn(9,">> Resetting..\n");
 					mod->reset(tnext.moduleno);
 				} else {
 					eprintf(">> GFX module without reset shouldn't happen: %s\n", mod->name);
 				}
 			} else {
-				slogn(100,".");
+				slogn(10,".");
 			};
 			ret = mod->draw(tnext.moduleno, tnext.args.argc, tnext.args.argv);
 			asl_clearav(&tnext.args);
@@ -380,9 +381,8 @@ int sled_main(int argc, char** argv) {
 					break;
 				case 1 :
 					if (lastmod != tnext.moduleno) // not an animation.
-						slogn(10,"Module chose to pass its turn to draw.\n");
+						slogn(9,"Module chose to pass its turn to draw.\n");
 					pick_next(lastmod, udate() + T_MILLISECOND);
-					lastmod = -1;
 					break;
 				default :
 					eprintf("Module %s failed to draw: Returned %i", mod->name, ret);

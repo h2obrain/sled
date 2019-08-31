@@ -31,7 +31,7 @@ static int mod_freeslot(void) {
 	if (module_count == MAX_MODULES)
 		return -1;
 	int ret = module_count++;
-	slogn(10,"free-slot: %d\n",ret);
+	slogn(20,"free-slot: %d\n",ret);
 	return ret;
 }
 
@@ -53,22 +53,20 @@ int mod_new(int loader, const char * name, int out_chain) {
 	if (slot == -1)
 		return -1;
 	module * mod = modules + slot;
-	//if (mod) {
-		fflush(stdout);
-		slogn(10,"loading module '%s' (modid:%d)\n", name,slot);
-		memset(mod, 0, sizeof(module));
-		mod->chain_link = out_chain;
-		mod->responsible_modloader = loader;
-		util_strlcpy(mod->type, name, 4);
-		util_strlcpy(mod->name, name + 4, 256);
-		if (modules[loader].load(loader, mod, name)) {
-			// Since this didn't load, make sure it isn't unloaded
-			mod->responsible_modloader = -1;
-			module_count--;
-			assert(module_count == slot);
-			return -1;
-		}
-	//}
+	fflush(stdout);
+	slogn(20,"loading module '%s' (modid:%d)\n", name,slot);
+	memset(mod, 0, sizeof(module));
+	mod->chain_link = out_chain;
+	mod->responsible_modloader = loader;
+	util_strlcpy(mod->type, name, 4);
+	util_strlcpy(mod->name, name + 4, 256);
+	if (modules[loader].load(loader, mod, name)) {
+		// Since this didn't load, make sure it isn't unloaded
+		mod->responsible_modloader = -1;
+		module_count--;
+		assert(module_count == slot);
+		return -1;
+	}
 	return slot;
 }
 

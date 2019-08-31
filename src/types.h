@@ -17,7 +17,7 @@ typedef uint64_t oscore_time;
 #define ARRAY_SIZE(stuff) (sizeof(stuff) / sizeof(stuff[0]))
 #define eprintf(...) fprintf(stderr, __VA_ARGS__)
 #ifndef SLOG_LVL
-#define SLOG_LVL 1000
+#define SLOG_LVL 10
 #endif
 #define slogn(n,...) if (n<=SLOG_LVL) { printf(__VA_ARGS__); fflush(stdout); }
 #define slog(...) slogn(10,__VA_ARGS__)
