@@ -3,6 +3,7 @@
 #ifndef __INCLUDED_TYPES__
 #define __INCLUDED_TYPES__
 #include <stdint.h>
+#include <stdio.h>
 
 // Types
 typedef unsigned char byte;
@@ -15,6 +16,11 @@ typedef uint64_t oscore_time;
 // Macros
 #define ARRAY_SIZE(stuff) (sizeof(stuff) / sizeof(stuff[0]))
 #define eprintf(...) fprintf(stderr, __VA_ARGS__)
+#ifndef SLOG_LVL
+#define SLOG_LVL 1000
+#endif
+#define slogn(n,...) if (n<=SLOG_LVL) { printf(__VA_ARGS__); fflush(stdout); }
+#define slog(...) slogn(10,__VA_ARGS__)
 
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))

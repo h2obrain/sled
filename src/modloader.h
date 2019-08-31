@@ -15,11 +15,17 @@ int modloader_initout(asl_av_t* flt_names, asl_av_t* flt_args);
 
 // -- Matrix/Timers should be inited here --
 
-// Loads and initializes all gfx/bgm modules that show up in a two-pass manner.
-int modloader_initgfx(void);
+// Loads all gfx/bgm modules that show up
+int modloader_loadgfx(void);
 
-// Deinitialize the GFX/BGM modules in a two-pass manner.
-void modloader_deinitgfx(void);
+// Deinitialize the GFX/BGM modules
+void modloader_unloadgfx(void);
+
+// Initializes a single gfx/bgm module that show up
+int modloader_initgfx(int mid);
+
+// Deinitializes a single GFX/BGM module
+int modloader_deinitgfx(int mid);
 
 // -- Matrix/Timers should go down here --
 

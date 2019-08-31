@@ -33,7 +33,7 @@ void mod_unload_to_count(int count, int deinit, int unload);
 static asl_av_t all_gfxbgm = {0, NULL};
 
 int modloader_initmod() {
-	puts("Initializing modloader tree...");
+	slogn(10,"Initializing modloader tree...");
 	asl_av_t done = {0, NULL};
 	// Inject k2link.
 	mod_new_k2link();
@@ -67,7 +67,7 @@ int modloader_initmod() {
 							}
 						}
 						if ((avl.argv[ac][0] == 'm') && (avl.argv[ac][1] == 'o') && (avl.argv[ac][2] == 'd')) {
-							printf("%s -> %s\n", v->name, avl.argv[ac]);
+							slogn(10,"%s -> %s\n", v->name, avl.argv[ac]);
 							// Another modloader to add to the pile?
 							int nml = mod_new(loader, avl.argv[ac], 0);
 							if (nml != -1) {
@@ -105,7 +105,7 @@ static int modloader_load(const char * name, int chain_link) {
 		if (!strcmp(v->type, "mod")) {
 			int v2 = mod_new(loader, name, chain_link);
 			if (v2 != -1) {
-				printf("%s -> %s\n", v->name, name);
+				slogn(10,"%s -> %s\n", v->name, name);
 				return v2;
 			}
 		}
@@ -132,13 +132,13 @@ static int modloader_load_and_init(const char * name, char * args, int chain_lin
 int modloader_initout(asl_av_t* flt_names, asl_av_t* flt_args) {
 	// Used to revert
 	int backup_modcount = mod_count();
-	puts("Initializing output module and filters...");
+	slogn(10,"Initializing output module and filters...\n");
 	int current_outmod = -1;
 	while (flt_names->argc > 0) {
 		char * nam = asl_pnabav(flt_names);
 		int val = modloader_load_and_init(nam, asl_pnabav(flt_args), current_outmod);
 		if (val == -1) {
-			printf("%s had a load error...\n", nam);
+			slogn(10,"%s had a load error...\n", nam);
 			mod_unload_to_count(backup_modcount, 1, 1);
 			free(nam);
 			return -1;
@@ -154,49 +154,59 @@ int modloader_initout(asl_av_t* flt_names, asl_av_t* flt_args) {
 static int modloader_pregfx_mod_count;
 static asl_iv_t modloader_gfx_inited;
 
-int modloader_initgfx(void) {
+int modloader_loadgfx() {
 	modloader_pregfx_mod_count = mod_count();
-	asl_iv_t loaded = {0, NULL};
 	for (int i = 0; i < all_gfxbgm.argc; i++) {
 		int ld = modloader_load(all_gfxbgm.argv[i], -1);
 		if (ld == -1) {
-			printf("%s had a load error...\n", all_gfxbgm.argv[i]);
+			slogn(10,"%s had a load error\n", all_gfxbgm.argv[i]);
 			mod_unload_to_count(modloader_pregfx_mod_count, 0, 1);
-			asl_cleariv(&loaded);
 			return 1;
 		}
-		asl_growiv(&loaded, ld);
-	}
-	puts("initializing");
-	for (int i = 0; i < loaded.argc; i++) {
-		module * mod = mod_get(loaded.argv[i]);
-		puts(mod->name);
-		if (mod->init(loaded.argv[i], NULL)) {
-			puts("...did not init");
-		} else {
-			puts("...did init");
-			mod->is_valid_drawable = 1;
-			// Bring GFX modules into rotation (see mod.h for details on this field)
-			if (!strcmp(mod->type, "gfx")) {
-				puts("...and has rotation privs");
-				asl_growiv(&modloader_gfx_rotation, loaded.argv[i]);
-			}
-			asl_pgrowiv(&modloader_gfx_inited, loaded.argv[i]);
+		// Bring GFX modules into rotation (see mod.h for details on this field)
+		module *mod = mod_get(i);
+		if (strcmp(mod->type, "gfx")==0) {
+			slogn(10,"%s (mid:%d ld:%d) has rotation privs\n", mod->name, i, ld);
+			asl_growiv(&modloader_gfx_rotation, i);
 		}
 	}
-	asl_cleariv(&loaded);
+	
 	return 0;
 }
-void modloader_deinitgfx(void) {
+int modloader_initgfx(int mid) {
+	module * mod = mod_get(mid);
+	if (mod->is_valid_drawable) return 0;
+	slogn(10,"initializing '%s'\n", mod->name); 
+	if (mod->init(mid, NULL)) {
+		slogn(10,"- failed\n");
+		return -1;
+	} else {
+		slogn(10,"- succeded\n");
+		mod->is_valid_drawable = 1;
+		asl_pgrowiv(&modloader_gfx_inited, mid);
+	}
+	return 0;
+}
+int modloader_deinitgfx(int mid) {
+	module * mod = mod_get(mid);
+	if (!mod->is_valid_drawable) return 0;
+	slogn(10,"deinitializing %s\n", mod->name);
+	mod->deinit(mid);
+	mod->is_valid_drawable = 0;
+	int ret = asl_deliv(&modloader_gfx_inited, mid);
+	assert(ret==0);
+	return ret;
+}
+void modloader_unloadgfx() {
 	asl_cleariv(&modloader_gfx_rotation);
 	for (int i = 0; i < modloader_gfx_inited.argc; i++) {
 		int mid = modloader_gfx_inited.argv[i];
-		module * mod = mod_get(mid);
-		mod->deinit(mid);
+		modloader_deinitgfx(mid);
 	}
 	asl_cleariv(&modloader_gfx_inited);
 	mod_unload_to_count(modloader_pregfx_mod_count, 0, 1);
 }
+
 // -- Remaining deinit --
 void modloader_deinitend(void) {
 	mod_unload_to_count(0, 1, 1);

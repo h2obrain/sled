@@ -83,6 +83,25 @@ char * asl_pnabav(asl_av_t * self) {
 	}
 }
 
+int asl_delav(asl_av_t * self, char *av) {
+	for (int i=0; i<self->argc; i++) {
+		if (self->argv[i] != av) continue;
+		self->argc--;
+		memmove(self->argv + i, self->argv + i + 1, sizeof(char*) * (self->argc - i));
+		// this results in a lot of allocs (together with add functions)
+		if (self->argc) {
+			self->argv = realloc(self->argv, sizeof(char*) * self->argc);
+			assert(self->argv);
+			if (!self->argv) return -1;
+		} else {
+			free(self->argv);
+			self->argv = NULL;
+		}
+		return 0;
+	}
+	return -1;
+}
+
 void asl_clearav(asl_av_t * self) {
 	if (self->argv) {
 		int i;
@@ -147,6 +166,25 @@ int asl_pnabiv(asl_iv_t * self) {
 		}
 		return res;
 	}
+}
+
+int asl_deliv(asl_iv_t * self, int iv) {
+	for (int i=0; i<self->argc; i++) {
+		if (self->argv[i] != iv) continue;
+		self->argc--;
+		memmove(self->argv + i, self->argv + i + 1, sizeof(int) * (self->argc - i));
+		// this results in a lot of allocs (together with add functions)
+		if (self->argc) {
+			self->argv = realloc(self->argv, sizeof(int) * self->argc);
+			assert(self->argv);
+			if (!self->argv) return -1;
+		} else {
+			free(self->argv);
+			self->argv = NULL;
+		}
+		return 0;
+	}
+	return -1;
 }
 
 void asl_cleariv(asl_iv_t * self) {

@@ -47,29 +47,29 @@ static int ci_iteration_count = 0;
 #endif
 
 static int deinit(void) {
-	printf("Cleaning up GFX/BGM modules..."); fflush(stdout);
+	slogn(10,"Cleaning up GFX/BGM modules...");
 	int ret;
-	modloader_deinitgfx();
-	printf(" Done!\nCleaning up output module interface..."); fflush(stdout);
+	modloader_unloadgfx();
+	slogn(10," Done!\nCleaning up output module interface...");
 	if ((ret = matrix_deinit()) != 0)
 		return ret;
 	if ((ret = timers_deinit()) != 0)
 		return ret;
-	printf(" Done!\nCleaning up output module and filters..."); fflush(stdout);
+	slogn(10," Done!\nCleaning up output module and filters...");
 	modloader_deinitend();
-	printf(" Done!\nCleaning up bits and pieces..."); fflush(stdout);
+	slogn(10," Done!\nCleaning up bits and pieces...");
 	oscore_mutex_free(rmod_lock);
 	if (main_rmod_override != -1)
 		asl_clearav(&main_rmod_override_args);
 	if (modloader_modpath != default_moduledir) free(modloader_modpath);
 	modloader_modpath = NULL;
 
-	printf(" Done!\nCleaning up Taskpool..."); fflush(stdout);
+	slogn(10," Done!\nCleaning up Taskpool...");
 	taskpool_forloop_free();
 	taskpool_destroy(TP_GLOBAL);
 
 
-	printf(" Done.\nGoodbye. :(\n");
+	slogn(1," Done.\nGoodbye. :(\n");
 	return 0;
 }
 
@@ -83,6 +83,7 @@ static int pick_next_random(int current_modno, oscore_time in) {
 	} else {
 		for (int i = 0; i < 2; i++) {
 			next_mod = modloader_gfx_rotation.argv[rand() % modloader_gfx_rotation.argc];
+			slogn(100,"Randomly selected modno:%d\n", next_mod);
 			if (next_mod != current_modno)
 				break;
 		}
@@ -189,7 +190,7 @@ static int interrupt_count = 0;
 static void interrupt_handler(int sig) {
 	//
 	if (interrupt_count == 0) {
-		printf("sled: Quitting due to interrupt...\n");
+		slogn(0,"sled: Quitting due to interrupt...\n");
 		timers_doquit();
 	} else if (interrupt_count == 1) {
 		eprintf("sled: Warning: One more interrupt until ungraceful exit!\n");
@@ -300,7 +301,7 @@ int sled_main(int argc, char** argv) {
 	// Initialize Timers.
 	ret = timers_init(outmodno);
 	if (ret) {
-		printf("Timers failed to initialize.\n");
+		eprintf("Timers failed to initialize.\n");
 		modloader_deinitend();
 		free(modloader_modpath);
 		return ret;
@@ -310,7 +311,7 @@ int sled_main(int argc, char** argv) {
 	ret = matrix_init(outmodno);
 	if (ret) {
 		// Fail.
-		printf("Matrix failed to initialize, which means someone's been making matrix_init more complicated. Uhoh.\n");
+		eprintf("Matrix failed to initialize, which means someone's been making matrix_init more complicated. Uhoh.\n");
 		timers_deinit();
 		modloader_deinitend();
 		free(modloader_modpath);
@@ -319,7 +320,7 @@ int sled_main(int argc, char** argv) {
 
 	rmod_lock = oscore_mutex_new();
 
-	ret = modloader_initgfx();
+	ret = modloader_loadgfx();
 	if (ret)
 		eprintf("Failed to load graphics modules (%i), continuing, what could possibly go wrong?\n", ret);
 
@@ -338,55 +339,61 @@ int sled_main(int argc, char** argv) {
 		if (tnext.moduleno == -1) {
 			// Queue random.
 			pick_next(lastmod, udate() + TIME_SHORT * T_SECOND);
-		} else {
-			if (tnext.time > timers_wait_until(tnext.time)) {
-				// Early break. Set this timer up for elimination by any 0-time timers that have come along
-				if (tnext.time == 0)
-					tnext.time = 1;
-				timer_add(tnext.time, tnext.moduleno, tnext.args.argc, tnext.args.argv);
-				continue;
-			}
-			if (tnext.moduleno >= 0) {
-				assert(tnext.moduleno < mod_count());
-				module* mod = mod_get(tnext.moduleno);
+		} else
+		if (tnext.time > timers_wait_until(tnext.time)) {
+		//if (timers_wait_until(tnext.time) == 1) {
+			slogn(10,">> Early break\n");
+			// Early break (wait was interrupted). Set this timer up for elimination by any 0-time timers that have come along
+			if (tnext.time == 0) tnext.time = 1;
+			timer_add(tnext.time, tnext.moduleno, tnext.args.argc, tnext.args.argv);
+		} else
+		if (tnext.moduleno >= 0) {
+			assert(tnext.moduleno < mod_count());
+			module* mod = mod_get(tnext.moduleno);
+			if ((tnext.moduleno != lastmod)||(!mod->is_valid_drawable)) {
+				if (lastmod >= 0) {
+					modloader_deinitgfx(lastmod);
+					lastmod = -1;
+				}
+				slogn(5,">> Now drawing '%s' (modno:%d)\n", mod->name,tnext.moduleno);
+				modloader_initgfx(tnext.moduleno);
 				if (!mod->is_valid_drawable) {
-					printf("\n>> Undrawable module in view: %s ; skipping...\n", mod->name);
+					eprintf(">> Undrawable module in view: %s ; skipping...\n", mod->name);
 					asl_clearav(&tnext.args);
 					continue;
 				}
-				if (tnext.moduleno != lastmod) {
-					printf("\n>> Now drawing %s", mod->name);
-					fflush(stdout);
-					if (mod->reset) {
-						mod->reset(tnext.moduleno);
-					} else {
-						printf("\n>> GFX module without reset shouldn't happen: %s\n", mod->name);
-					}
+				// remove this? it's called from most init functions, I think
+				if (mod->reset) {
+					slogn(10,">> Resetting..\n");
+					mod->reset(tnext.moduleno);
 				} else {
-					printf(".");
-					fflush(stdout);
-				};
-				ret = mod->draw(tnext.moduleno, tnext.args.argc, tnext.args.argv);
-				asl_clearav(&tnext.args);
-				lastmod = tnext.moduleno;
-				if (ret != 0) {
-					if (ret == 1) {
-						if (lastmod != tnext.moduleno) // not an animation.
-							printf("\nModule chose to pass its turn to draw.");
-						pick_next(lastmod, udate() + T_MILLISECOND);
-						lastmod = -1;
-					} else {
-						eprintf("Module %s failed to draw: Returned %i", mod->name, ret);
-						timers_quitting = 1;
-						deinit();
-						return 7;
-					}
+					eprintf(">> GFX module without reset shouldn't happen: %s\n", mod->name);
 				}
 			} else {
-				// Virtual null module
-				printf(">> using virtual null module\n");
-				asl_clearav(&tnext.args);
+				slogn(100,".");
+			};
+			ret = mod->draw(tnext.moduleno, tnext.args.argc, tnext.args.argv);
+			asl_clearav(&tnext.args);
+			lastmod = tnext.moduleno;
+			switch (ret) {
+				case 0 :
+					break;
+				case 1 :
+					if (lastmod != tnext.moduleno) // not an animation.
+						slogn(10,"Module chose to pass its turn to draw.\n");
+					pick_next(lastmod, udate() + T_MILLISECOND);
+					lastmod = -1;
+					break;
+				default :
+					eprintf("Module %s failed to draw: Returned %i", mod->name, ret);
+					timers_quitting = 1;
+					deinit();
+					return 7;
 			}
+		} else {
+			// Virtual null module
+			eprintf(">> using virtual null module\n");
+			asl_clearav(&tnext.args);
 		}
 	}
 	return deinit();

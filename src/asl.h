@@ -28,6 +28,9 @@ void asl_pgrowav(asl_av_t * self, char * nxt);
 // Returns NULL if there's nothing to remove.
 char * asl_pnabav(asl_av_t * self);
 
+// Removes the first occurrence of val
+int asl_delav(asl_av_t * self, char *val);
+
 // Clears (frees all elements of, and the array of, then resets) an asl_av_t.
 void asl_clearav(asl_av_t * self);
 
@@ -45,6 +48,7 @@ typedef struct {
 void asl_growiv(asl_iv_t * self, int nxt);
 void asl_pgrowiv(asl_iv_t * self, int nxt);
 int asl_pnabiv(asl_iv_t * self);
+int asl_deliv(asl_iv_t * self, int iv);
 void asl_cleariv(asl_iv_t * self);
 
 // Test functions (use for tracing memory corruption)

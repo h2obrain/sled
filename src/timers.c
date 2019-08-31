@@ -25,6 +25,7 @@
 #include "oscore.h"
 #include "main.h"
 #include "timers.h"
+#include <assert.h>
 
 static struct timer TIMERS[MAX_TIMERS];
 static int timer_count = 0;
@@ -69,6 +70,7 @@ void timers_wait_until_break(void) {
 }
 
 int timer_add(oscore_time usec,int moduleno, int argc, char* argv[]) {
+	assert(moduleno < mod_count());
 	struct timer t = { .moduleno = moduleno, .time = usec, .args = {argc, argv}};
 
 	oscore_mutex_lock(tlock);
@@ -95,27 +97,32 @@ timer timer_get(void) {
 	// Find the soonest/smallest timer.
 	int smallest = 0;
 	oscore_time min = TIMERS[0].time;
-	if (timer_count > 1)
-		for (int i = 1; i < timer_count; i++)
-			if (min > TIMERS[i].time) {
-				smallest = i;
-				min = TIMERS[i].time;
-			}
+	for (int i = 1; i < timer_count; i++) {
+		if (min > TIMERS[i].time) {
+			smallest = i;
+			min = TIMERS[i].time;
+		}
+	}
 
 	// Keep it.
 	t = TIMERS[smallest];
 
 	if (t.time == 0) {
 		// Clear all timers safely. Note that this timer's argc/argv is being used.
-		for (int i = 0; i < timer_count; i++)
+		for (int i = 0; i < timer_count; i++) {
 			if (i != smallest)
 				asl_clearav(&TIMERS[i].args);
+		}
+		timer_count = 0;
+	} else
+	if (timer_count==1) {
 		timer_count = 0;
 	} else {
 		// Move things back.
 		memmove(&TIMERS[smallest], &TIMERS[smallest+1], (timer_count - smallest - 1) * sizeof(timer));
 		timer_count--;
 	}
+	assert(t.moduleno < mod_count());
 
 	oscore_mutex_unlock(tlock);
 	return t;
