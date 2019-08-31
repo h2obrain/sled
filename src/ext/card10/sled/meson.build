@@ -8,7 +8,7 @@ freertos = static_library(
   include_directories: [
     freertos_includes,
     include_directories('.'),
-#    include_directories('../../epicardium')
+    include_directories('../../epicardium')
   ],
 )
 

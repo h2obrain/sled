@@ -8,7 +8,7 @@
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdlib.h>
+#include <inttypes.h>
 
 #include <stdio.h>
 
@@ -39,11 +39,15 @@ void user_main(void* pvParameters, int core) {
 
 	if(xTaskGetSchedulerState() == 1)
 		vTaskStartScheduler();
+#if defined(INCLUDE_xTaskCreatePinnedToCore)
 	if (core < 0 || core >= oscore_ncpus()) {
 		xTaskCreate(sled_task, "sled_main", STACK_DEPTH, pvParameters, TASK_PRIORITY, NULL);
 	} else {
 		xTaskCreatePinnedToCore(sled_task, "sled_main", STACK_DEPTH, pvParameters, TASK_PRIORITY, NULL, core);
 	}
+#else
+	xTaskCreate(sled_task, "sled_main", STACK_DEPTH, pvParameters, TASK_PRIORITY, NULL);
+#endif
 }
 
 // -- event
@@ -66,19 +70,18 @@ int oscore_event_wait_until(oscore_event ev, oscore_time desired_usec) {
 
 	if (desired_usec == 1) {
 		oscore_task_yield();
-
 		printf("desired_usec is 1. wtf?\n");
 	} else {
-		printf("desired_usec is %lu.\n", desired_usec);
+		printf("desired_usec is %"PRIu64".\n", desired_usec);
 	}
 
 	oscore_time waketick = oscore_udate();
 	if (waketick >= desired_usec) {
-		printf("timer is late, waketick: %lu, desired: %lu\n", waketick, desired_usec);
-		return waketick;
+		printf("timer is late, waketick: %"PRIu64", desired: %"PRIu64"\n", waketick, desired_usec);
+		return waketick==1?0:waketick;
 	}
 	oscore_time diff = desired_usec-waketick;
-	printf("diff is %lu.\n", diff);
+	printf("diff is %"PRIu64".\n", diff);
 	// make the minimum time to wait 5ms.
 	// TODO: should be removed once we know what's going on.
 	if (diff <= 5000) diff = 5000;
@@ -145,12 +148,14 @@ oscore_task oscore_task_create(const char* name, oscore_task_function func, void
 }
 
 void oscore_task_setprio(oscore_task task, int prio) {
+#if INCLUDE_vTaskPrioritySet
 	if (prio < 0) {
 		prio = 0;
 	} else if (prio > configMAX_PRIORITIES -1) {
 		prio = configMAX_PRIORITIES -1;
 	}
 	vTaskPrioritySet(task, prio);
+#endif
 }
 
 void oscore_task_yield(void) {
@@ -161,7 +166,11 @@ void oscore_task_pin(oscore_task task, int cpu) {}
 
 void* oscore_task_join(oscore_task task) {
 	if (task != NULL) {
+#if INCLUDE_vTaskDelete
 		vTaskDelete(task);
+#else
+		printf("Dying.\n");
+#endif
 	}
 	free(task);
 	return 0;

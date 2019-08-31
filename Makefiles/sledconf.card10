@@ -43,6 +43,9 @@ DEFAULT_MODULEDIR := "./modules"
    # Module build selection #
    ##########################
 
+CIMODE := 1 # run modules in natural order
+#CIMODE := 0 # run modules in random order
+
 ## required output module
 MODULES := out_$(DEFAULT_OUTMOD)
 
@@ -55,15 +58,17 @@ MODULES += $(FLTMODS_DEFAULT)
 ## Comment this out if you want to build only single modules
 #MODULES += $(GFXMODS_DEFAULT)
 
-MODULES += gfx_bttrblls
-MODULES += gfx_random_rects
-MODULES += gfx_partirush
-MODULES += gfx_starfield
-MODULES += gfx_cube
-MODULES += gfx_matrix
-MODULES += gfx_rule90
-MODULES += gfx_twinkle
-
+# List of modules to compile.
+MODULES += gfx_twinkle gfx_gol gfx_rainbow gfx_math_sinpi gfx_plasma
+MODULES += gfx_balls gfx_clock gfx_sinematrix gfx_error gfx_partirush
+MODULES += gfx_matrix gfx_cube gfx_mandelbrot gfx_golc gfx_sinefield
+MODULES += gfx_affinematrix gfx_candyflow gfx_bttrblls
+MODULES += gfx_sort2D gfx_xorrid gfx_starfield gfx_reddot gfx_sparkburn
+MODULES += gfx_sort1D gfx_rgbmatrix gfx_mandelbrot2 gfx_disturbedcandy
+MODULES += gfx_ghostery gfx_ursuppe gfx_afterglow gfx_fire
+MODULES += gfx_candyswarm gfx_ursuppe2 gfx_invfourier gfx_colorwheel
+## ignored
+#MODULES += gfx_ip
 
    ############################
    # Output size configuraion #
@@ -86,3 +91,8 @@ CFLAGS += -fsingle-precision-constant
 CFLAGS += -fno-isolate-erroneous-paths-dereference
 CFLAGS += -ffast-math
 
+# limit FPS
+CFLAGS += -DFPS=15
+
+# log level
+CFLAGS += -DSLOG_LVL=5

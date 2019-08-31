@@ -14,14 +14,22 @@ if [ -z ${FIRMWARE_HOME+x} ]
 then
 	echo "FIRMWARE_HOME needs to be defined"
 else
-	rm -r ${FIRMWARE_HOME}/l0dables/sled &&
+	if [ -d ${FIRMWARE_HOME}/l0dables/sled ]; then rm -r ${FIRMWARE_HOME}/l0dables/sled; fi &&
 	cp -r src/ext/card10/sled ${FIRMWARE_HOME}/l0dables/sled &&
 fi &&
-grep -qxF "subdir('sled/')" ${FIRMWARE_HOME}/l0dables/meson.build || (echo "subdir('sled/')" >> ${FIRMWARE_HOME}/l0dables/meson.build)
+(grep -qxF "subdir('sled/')" ${FIRMWARE_HOME}/l0dables/meson.build || (echo "subdir('sled/')" >> ${FIRMWARE_HOME}/l0dables/meson.build)) &&
+echo "done."
 ```
 
 Bootstrap/compile card10
 ```sh
-./bootstrap.sh -Djailbreak_card10=true &&
-ninja -C build
+## before 1.9
+# ./bootstrap.sh -Djailbreak_card10=true && ninja -C build
+## after 1.9
+./bootstrap.sh && ninja -C build
 ```
+
+Now copy `build/l0dable/sled/sled.elf` to `${card10_flash}/apps/sled.elf`
+Maybe also update the firmware by copying `build/pycardium/pycardium_epicardium.bin`to `${card10_flash}/card10.bin`
+After firmware version 1.9 you have to enbable elf loading by creating `echo "execute_elf=1" >> ${card10_flash}/card10.cfg`
+
