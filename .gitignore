@@ -8,6 +8,9 @@ sledconf
 sled
 sled.fish
 
+# libsled
+**/libsled.a
+
 # crashy stuff
 *.core
 *.swp
