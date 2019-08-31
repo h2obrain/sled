@@ -15,7 +15,10 @@
 #include <math.h>
 #include <perf.h>
 
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_MEDIUM * FPS)
 

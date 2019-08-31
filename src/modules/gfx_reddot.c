@@ -24,7 +24,10 @@
 #include <graphics.h>
 #include <math.h>
 
+#ifndef FPS
 #define FPS 20
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_SHORT * FPS)
 

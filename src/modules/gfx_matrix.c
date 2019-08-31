@@ -22,7 +22,10 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#ifndef FPS
 #define FPS 30
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_SHORT * FPS)
 

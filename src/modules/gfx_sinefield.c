@@ -12,7 +12,10 @@
 #include <mathey.h>
 #include <math.h>
 
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_LONG * FPS)
 

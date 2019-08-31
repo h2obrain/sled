@@ -30,7 +30,10 @@ static int die = 0.0;
     //fflush(0);printf("%d",1/die);
 
 
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_LONG * FPS)
 

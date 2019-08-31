@@ -15,7 +15,10 @@
 #include <graphics.h>
 
 // Then a bunch of defines,
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_SHORT * FPS)
 

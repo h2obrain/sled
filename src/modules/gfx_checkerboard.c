@@ -19,7 +19,10 @@
 #include <timers.h>
 #include <stddef.h>
 
+#ifndef FPS
 #define FPS 2
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_SHORT * FPS)
 

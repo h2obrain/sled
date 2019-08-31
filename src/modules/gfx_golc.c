@@ -22,7 +22,10 @@
 #include <stdbool.h>
 
 // we're looping every millisecond here to accomodate the fader
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_MEDIUM * FPS)
 

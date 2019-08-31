@@ -17,7 +17,10 @@
 #include <stdlib.h>
 #include <random.h>
 
+#ifndef FPS
 #define FPS 60
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_LONG * FPS)
 

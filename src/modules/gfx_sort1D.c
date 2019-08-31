@@ -32,7 +32,10 @@
 
 
 // Speed settings
+#ifndef FPS
 #define FPS 30
+#endif
+
 #ifndef GFX_SORT_1D_TIME
 //#define GFX_SORT_1D_TIME 1
 #endif

@@ -61,7 +61,10 @@ static oscore_time px_mtlastframe;
 static oscore_task px_task;
 
 
+#ifndef FPS
 #define FPS 60
+#endif
+
 // #define PX_MTCOUNTDOWN_MAX 120
 #define FRAMETIME (T_SECOND / FPS)
 #define PX_PORT 1337

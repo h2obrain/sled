@@ -22,7 +22,10 @@
 #include <math.h>
 #include <complex.h>
 
+#ifndef FPS
 #define FPS 20
+#endif
+
 #define FRAMETIME (T_SECOND / FPS)
 #define FRAMES (TIME_MEDIUM * FPS)
 
