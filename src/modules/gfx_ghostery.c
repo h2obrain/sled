@@ -93,8 +93,8 @@ int init(int moduleno, char* argstr) {
 	fx = mx;
 	fy = my + fo;
 	fire_bufsize = fx*fy;
-	fire_buffer[0] = malloc(fire_bufsize);
-	fire_buffer[1] = malloc(fire_bufsize);
+	fire_buffer[0] = calloc(fire_bufsize,1);
+	fire_buffer[1] = calloc(fire_bufsize,1);
 	for( int i = 0; i <=255; i++ ) {
 		fire_palette[i] = fire_palette_func(i);
 	}

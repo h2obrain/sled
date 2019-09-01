@@ -33,7 +33,6 @@ static int frame = 0;
 static int moduleno;
 static int usesmall;
 static char clockstr[CHARS_FULL + 1];
-static text* rendered = NULL;
 
 int init (int modno, char* argstr) {
 	moduleno = modno;
@@ -69,9 +68,7 @@ int draw(int _modno, int argc, char* argv[]) {
 		}
 	}
 
-	if (rendered)
-		text_free(rendered);
-	rendered = text_render(clockstr);
+	text* rendered = text_render(clockstr);
 	if (!rendered)
 		return 2;
 
@@ -81,12 +78,17 @@ int draw(int _modno, int argc, char* argv[]) {
 	if (rendered)
 		padX = (matrix_getx() - rendered->len) / 2;
 	int padY = (matrix_gety() - 7) / 2;
-	for (y = 0; y < matrix_gety(); y++)
+	for (y = 0; y < matrix_gety(); y++) {
 		for (x = 0; x < matrix_getx(); x++) {
 			byte v = text_point(rendered, x - padX, y - padY);
 			RGB color = RGB(v, v, v);
 			matrix_set(x, y, color);
 		}
+	}
+
+	// This acts conditionally on rendered being non-NULL.
+	text_free(rendered);
+
 	matrix_render();
 	if (frame == FRAMES) {
 		frame = 0;
@@ -99,6 +101,4 @@ int draw(int _modno, int argc, char* argv[]) {
 }
 
 void deinit(int _modno) {
-	// This acts conditionally on rendered being non-NULL.
-	text_free(rendered);
 }
