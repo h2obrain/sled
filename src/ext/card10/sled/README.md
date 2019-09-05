@@ -9,7 +9,7 @@ Update libsled.a, copy this folder to `${FIRMWARE_HOME}/l0dables/sled` and add s
 ```sh
 cp Makefiles/sledconf.card10 sledconf &&
 make clean libsled.a &&
-mkdir src/ext/card10/sled/lib &&
+mkdir -p src/ext/card10/sled/lib &&
 mv libsled.a src/ext/card10/sled/lib/libsled.a &&
 if [ -z ${FIRMWARE_HOME+x} ]
 then

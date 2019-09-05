@@ -1,16 +1,14 @@
-#include "../types.h"
-#include "../oscore.h"
-#include "../main.h"
-#include "../timers.h"
+#include <inttypes.h>
+#include <stdio.h>
 #include "FreeRTOS.h"
+#include "../types.h"
+#include "../timers.h"
+#include "../main.h"
 #include "task.h"
 #include "semphr.h"
 #include <sys/time.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <inttypes.h>
-
-#include <stdio.h>
 
 #define STACK_DEPTH 16384
 #define TASK_PRIORITY 10
@@ -62,6 +60,11 @@ oscore_event oscore_event_new(void) {
 }
 
 int oscore_event_wait_until(oscore_event ev, oscore_time desired_usec) {
+	// PRIu64 aka llu printing is not supported
+	slogn(1000, "wait (%"PRIu32" > %"PRIu32") bg:0x%08"PRIx32"\n",
+			(uint32_t)(desired_usec/1000),(uint32_t)(oscore_udate()/1000),
+			(uint32_t)ev);
+	
 	// If desired_usec is 0, it is used to simply clear the event.
 	if (desired_usec == 0) {
 		xSemaphoreTake(ev, 0); // Only take when not taken.
@@ -69,34 +72,36 @@ int oscore_event_wait_until(oscore_event ev, oscore_time desired_usec) {
 	}
 
 	if (desired_usec == 1) {
-		oscore_task_yield();
-		printf("desired_usec is 1. wtf?\n");
+		slog("desired_usec is 1. wtf?\n");
+//		oscore_task_yield();
 	} else {
-		printf("desired_usec is %"PRIu64".\n", desired_usec);
+		slog("desired_usec is %"PRIu32".\n", (uint32_t)desired_usec);
 	}
 
 	oscore_time waketick = oscore_udate();
 	if (waketick >= desired_usec) {
-		printf("timer is late, waketick: %"PRIu64", desired: %"PRIu64"\n", waketick, desired_usec);
+		slog("timer is late, waketick: %"PRIu32", desired: %"PRIu32"\n", (uint32_t)waketick, (uint32_t)desired_usec);
 		return waketick==1?0:waketick;
 	}
 	oscore_time diff = desired_usec-waketick;
-	printf("diff is %"PRIu64".\n", diff);
+	slog("diff is %"PRIu32".\n", (uint32_t)diff);
+	/*
 	// make the minimum time to wait 5ms.
 	// TODO: should be removed once we know what's going on.
 	if (diff <= 5000) diff = 5000;
+	*/
 
 	TickType_t wait = pdMS_TO_TICKS(diff / 1000);
-	if (xSemaphoreTake(ev, wait) == pdTRUE) {
-		printf("INTERRUPT!\n");
+	if (wait && (xSemaphoreTake(ev, wait) == pdTRUE)) {
+		slog("INTERRUPT!\n");
 		return 1; // we got an interrupt
 	}
-	printf("Timeout.");
+	slog("Timeout.\n");
 	return 0; // timeout
 }
 
 void oscore_event_signal(oscore_event ev) {
-	printf("Signaling.\n");
+	slog("Signaling.\n");
 	xSemaphoreGive(ev);
 }
 
@@ -107,7 +112,7 @@ void oscore_event_free(oscore_event ev) {
 // Time keeping.
 // FreeRTOS provides a tick count
 oscore_time oscore_udate(void) {
-	return ((1000 * 1000 * 1000) / configTICK_RATE_HZ) * (oscore_time)xTaskGetTickCount();
+	return (((oscore_time)1000 * 1000 * 1000) / configTICK_RATE_HZ) * (oscore_time)xTaskGetTickCount();
 }
 
 // Below: Stubs and untestet stuff. Danger zone!
@@ -169,7 +174,7 @@ void* oscore_task_join(oscore_task task) {
 #if INCLUDE_vTaskDelete
 		vTaskDelete(task);
 #else
-		printf("Dying.\n");
+		slog("Dying.\n");
 #endif
 	}
 	free(task);

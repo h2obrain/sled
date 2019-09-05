@@ -269,7 +269,7 @@ static void own_reset(){
 
 void reset(int _modno) {
 	own_reset();
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 }
 
@@ -278,9 +278,9 @@ int draw(int _modno, int argc, char* argv[]) {
 	int my = matrix_gety();
 
 #ifdef SORT_TIMING
-    t1 = udate();
+    t1 = oscore_udate();
 	sort_data();
-    t2 = udate();
+    t2 = oscore_udate();
 #else
     sort_data();
 #endif
@@ -302,7 +302,7 @@ int draw(int _modno, int argc, char* argv[]) {
 #endif
 
 #ifdef SORT_TIMING
-    t3 = udate();
+    t3 = oscore_udate();
     td1_acc += (t2-t1);
     td2_acc += (t3-t2);
     timer_n += 1;

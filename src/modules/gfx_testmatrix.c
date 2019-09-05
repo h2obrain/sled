@@ -135,7 +135,7 @@ int draw(int argc, char* argv[]) {
     }
    
     matrix_render();
-	timer_add(udate()+5000000, modno, 0, NULL);
+	timer_add(oscore_udate()+5000000, modno, 0, NULL);
     return 0;
 }
 

@@ -48,7 +48,7 @@ static inline void tp_putjob(taskpool* pool, taskpool_job job) {
 		oscore_mutex_unlock(pool->lock);
 		// Wait for 5ms as a fallback in case something goes wrong w/ progress.
 		// Should only ever be a problem with multiple writers, but...
-		oscore_event_wait_until(pool->progress, udate() + 5000UL);
+		oscore_event_wait_until(pool->progress, oscore_udate() + 5000UL);
 		oscore_mutex_lock(pool->lock);
 	}
 	// Update the job, and unlock
@@ -81,7 +81,7 @@ static void * taskpool_function(void* ctx) {
 	taskpool_job job;
 	while (1) {
 		// Wait for the event to be triggered that says a task is ready. Wait 50ms, since any issues should only occur on shutdown.
-		oscore_event_wait_until(pool->wakeup, udate() + 50000UL);
+		oscore_event_wait_until(pool->wakeup, oscore_udate() + 50000UL);
 		while (1) {
 			// It's possible that the event we just got covered multiple tasks.
 			// Accept as many tasks as possible during our active time.
@@ -105,6 +105,7 @@ static void * taskpool_function(void* ctx) {
 }
 
 taskpool* taskpool_create(const char* pool_name, int workers, int queue_size) {
+	slogn(10, "taskpool_create workers:%d queue_size:%d\n",workers,queue_size);
 	// Create the threads.
 	taskpool* pool = calloc(sizeof(taskpool), 1);
 	pool->queue_size = queue_size;
@@ -196,7 +197,7 @@ void taskpool_wait(taskpool* pool) {
 	// While the task list isn't empty, unlock, wait for progress, then lock again.
 	while (pool->jobs_reading != pool->jobs_writing) {
 		oscore_mutex_unlock(pool->lock);
-		oscore_event_wait_until(pool->progress, udate() + 50000UL);
+		oscore_event_wait_until(pool->progress, oscore_udate() + 50000UL);
 		oscore_mutex_lock(pool->lock);
 	}
 	// Clear any remaining progress events.

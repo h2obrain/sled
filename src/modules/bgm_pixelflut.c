@@ -555,7 +555,7 @@ int draw(int _modno, int argc, char ** argv) {
 #ifdef PX_MTCOUNTDOWN_MAX
 		px_mtcountdown = PX_MTCOUNTDOWN_MAX;
 #endif
-		px_mtlastframe = udate();
+		px_mtlastframe = oscore_udate();
 		if (px_bgminactive) {
 			int indx = 0;
 			for (int j = 0; j < px_my; j++) {

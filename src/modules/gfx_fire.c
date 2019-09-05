@@ -88,7 +88,7 @@ void fire_palette_init(void)
 }
 
 void reset(int _modno) {
-	fire_nexttick = udate();
+	fire_nexttick = oscore_udate();
 	fire_framecount = 0;
 	memset(fire, 0, matrix_getx() * matrix_gety() * sizeof(int));
 }

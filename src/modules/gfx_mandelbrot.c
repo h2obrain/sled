@@ -103,7 +103,7 @@ static inline float LOG_FADE(float start, float end,int part,int total){
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 	frame = 0;
 	min = 0;

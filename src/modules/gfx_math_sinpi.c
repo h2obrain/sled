@@ -52,7 +52,7 @@ int init(int moduleno, char* argstr) {
 RGB white = { .red = 255, .green = 255, .blue = 255 };
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 	pos = 0;
 }

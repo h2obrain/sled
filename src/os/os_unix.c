@@ -46,7 +46,7 @@ typedef struct {
 } oscore_event_i;
 
 int oscore_event_wait_until(oscore_event ev, oscore_time desired_usec) {
-	oscore_time tnow = udate();
+	oscore_time tnow = oscore_udate();
 	if (tnow >= desired_usec)
 		return tnow;
 	oscore_time sleeptime = desired_usec - tnow;

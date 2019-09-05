@@ -129,7 +129,7 @@ int init(int moduleno, char* argstr) {
 	printf("(output scale for width=%d: %f) ", mx, outputscale);
 	
 	modno = moduleno;
-	oscore_time d = udate();
+	oscore_time d = oscore_udate();
 	for( int i = 0; i < runvar_count; i++ ) {
 		runvar[i] = addmod(runvar[i], runmod[i], ((d>>(i/2)) & 0x00FF) / (255/M_PI));
 	}
@@ -146,7 +146,7 @@ static inline int _min(int,int);
 
 void reset(void) {
     matrix_clear();
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
     for (ball * b = balls; b < balls + numballs; b++){
         b->pos_x = (float) randn(matrix_getx());
@@ -328,7 +328,7 @@ static inline int _min(int x, int y) {
 /* central drawing function
  */
 int draw(int argc, char* argv[]) {
-	nexttick = udate() + FRAMETIME;
+	nexttick = oscore_udate() + FRAMETIME;
 	perf_start(modno);
 	// compose transformation matrix out of 9 input matrices 
 	// which are calculated from some of the run variables

@@ -91,7 +91,7 @@ int init(int moduleno, char* argstr) {
 
 
 void reset(int _modno) {
-    nexttick = udate();
+    nexttick = oscore_udate();
     for (int i =0; i < NO_OF_DOTS; i++){
         xs[i] = (float)randn(mx-1);
         ys[i] = (float)randn(my-1);

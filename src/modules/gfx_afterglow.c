@@ -87,7 +87,7 @@ int init(int moduleno, char* argstr) {
 
 
 void reset(int _modno) {
-    nexttick = udate();
+    nexttick = oscore_udate();
     //matrix_clear();
     //bx = randn((mx-1)/4);
     bx = -deadzone;

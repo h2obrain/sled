@@ -94,7 +94,7 @@ int init(int moduleno, char* argstr)
 
 void reset(int _modno)
 {
-   nexttick = udate();
+   nexttick = oscore_udate();
    memset(cstore, 0, sizeof(complex) * w * h);
    memset(istore, 0, sizeof(double) * w * h);
    matrix_clear();

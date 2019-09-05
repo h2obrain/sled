@@ -47,7 +47,7 @@ int init (int modno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 }
 

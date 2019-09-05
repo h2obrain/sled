@@ -37,6 +37,11 @@ DEFAULT_OUTMOD := card10
 ## Directory to put modules into
 DEFAULT_MODULEDIR := "./modules"
 
+# limit FPS
+CFLAGS += -DFPS=15
+
+# log level
+CFLAGS += -DSLOG_LVL=500000
 
 
    ##########################
@@ -59,40 +64,23 @@ MODULES += $(FLTMODS_DEFAULT)
 #MODULES += $(GFXMODS_DEFAULT)
 
 # List of modules to compile.
-MODULES += gfx_twinkle gfx_gol gfx_rainbow gfx_math_sinpi gfx_plasma
-MODULES += gfx_balls gfx_clock gfx_sinematrix gfx_error gfx_partirush
-MODULES += gfx_matrix gfx_cube gfx_mandelbrot gfx_golc gfx_sinefield
-MODULES += gfx_affinematrix gfx_candyflow gfx_bttrblls
-MODULES += gfx_sort2D gfx_xorrid gfx_starfield gfx_reddot gfx_sparkburn
-MODULES += gfx_sort1D gfx_rgbmatrix gfx_mandelbrot2 gfx_disturbedcandy
-MODULES += gfx_ghostery gfx_ursuppe gfx_afterglow gfx_fire
-MODULES += gfx_candyswarm gfx_ursuppe2 gfx_invfourier gfx_colorwheel
+MODULES += gfx_gol gfx_twinkle
+#MODULES += gfx_twinkle gfx_gol gfx_rainbow gfx_math_sinpi gfx_plasma
+#MODULES += gfx_balls gfx_clock gfx_sinematrix gfx_error gfx_partirush
+#MODULES += gfx_matrix gfx_cube gfx_mandelbrot gfx_golc gfx_sinefield
+#MODULES += gfx_affinematrix gfx_candyflow gfx_bttrblls
+#MODULES += gfx_sort2D gfx_xorrid gfx_starfield gfx_reddot gfx_sparkburn
+#MODULES += gfx_sort1D gfx_rgbmatrix gfx_mandelbrot2 gfx_disturbedcandy
+#MODULES += gfx_ghostery gfx_ursuppe gfx_afterglow gfx_fire
+#MODULES += gfx_candyswarm gfx_ursuppe2 gfx_invfourier gfx_colorwheel
 ## ignored
 #MODULES += gfx_ip
 
    ############################
-   # Output size configuraion #
+   # Output size configuration #
    ############################
 
 ## X and Y dimensions
 MATRIX_X := 160
 MATRIX_Y := 80
 
-# CFLAGS
-CFLAGS += -O3
-CFLAGS += -mthumb
-CFLAGS += -mcpu=cortex-m4
-CFLAGS += -mfloat-abi=softfp
-CFLAGS += -mfpu=fpv4-sp-d16
-CFLAGS += -Wa,-mimplicit-it=thumb
-CFLAGS += -ffunction-sections
-CFLAGS += -fdata-sections
-CFLAGS += -fsingle-precision-constant
-CFLAGS += -fno-isolate-erroneous-paths-dereference
-CFLAGS += -ffast-math
-
-# limit FPS
-CFLAGS += -DFPS=15
-
-# log level
-CFLAGS += -DSLOG_LVL=5

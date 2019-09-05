@@ -262,7 +262,7 @@ int draw(int _modno, int argc, char ** argv) {
 			assert(x);
 			*x = strdup("/blank");
 			assert(*x);
-			timer_add(udate() + T_SECOND, fish_moduleno, 1, x);
+			timer_add(oscore_udate() + T_SECOND, fish_moduleno, 1, x);
 			return 0;
 		} else if (!strcmp(argv[0], "/error42")) {
 			// Trigger error 42 as a quick escape.

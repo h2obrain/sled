@@ -48,7 +48,7 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	twinkle_nexttick = udate();
+	twinkle_nexttick = oscore_udate();
 	twinkle_framecount = 0;
 	memset(twinkle_levels, 0, matrix_getx() * matrix_gety() * sizeof(int));
 }

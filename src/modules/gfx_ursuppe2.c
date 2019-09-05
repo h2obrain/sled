@@ -288,7 +288,7 @@ static void update(void) {
 }
 
 void reset(void) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 	randomize();
 	frame = 0;

@@ -12,6 +12,7 @@
 
 #include "FreeRTOS.h"
 #include <types.h>
+//#include <plugin.h>
 #include <timers.h>
 #include <matrix.h>
 #include <timers.h>
@@ -21,7 +22,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <colors.h>
+
 #include <assert.h>
+#include <inttypes.h>
 
 union disp_framebuffer fb;
 
@@ -119,7 +122,7 @@ int render(void) {
 	return epic_disp_framebuffer(&fb);
 }
 
-ulong wait_until(ulong desired_usec) {
+oscore_time wait_until(int moduleno, oscore_time desired_usec) {
 	if (desired_usec > 1) {
 		return timers_wait_until_core(desired_usec);
 	}
