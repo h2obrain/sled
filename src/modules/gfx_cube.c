@@ -131,7 +131,7 @@ int draw(int _modno, int argc, char* argv[]) {
 	matrix_render();
 	// Timing logic
 	if (framecount == 0) {
-		nexttick = udate();
+		nexttick = oscore_udate();
 	} else if (framecount >= FRAMES) {
 		framecount = 0;
 		return 1;

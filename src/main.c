@@ -32,6 +32,7 @@
 #include <getopt.h>
 #include <signal.h>
 
+#include <inttypes.h>
 
 static int outmodno = -1;
 
@@ -80,6 +81,7 @@ static int pick_next_random(int current_modno, oscore_time in) {
 	if (modloader_gfx_rotation.argc == 0) {
 		in += 5000000;
 		next_mod = -2;
+		//slogn(10,"No mods in modloader_gfx_rotation\n");
 	} else {
 		for (int i = 0; i < 2; i++) {
 			next_mod = modloader_gfx_rotation.argv[rand() % modloader_gfx_rotation.argc];
@@ -331,16 +333,26 @@ int sled_main(int argc, char** argv) {
 	signal(SIGINT, interrupt_handler);
 
 	// Startup.
-	pick_next(-1, udate());
+	pick_next(-1, oscore_udate());
+
+	slog("udate:%"PRIu32" sleep_until:%"PRIu32"\n",
+			(uint32_t)(oscore_udate()/1000),
+			(uint32_t)((oscore_udate()+100000)/1000)
+		);
+	timers_wait_until(oscore_udate()+100000);
 
 	int lastmod = -1;
 	while (!timers_quitting) {
+		slog("e");
 		timer tnext = timer_get();
+		slog("f");
 		if (tnext.moduleno == -1) {
 			// Queue random.
-			pick_next(lastmod, udate() + TIME_SHORT * T_SECOND);
+			slog("g");
+			pick_next(lastmod, oscore_udate() + TIME_SHORT * T_SECOND);
 		} else
 		if (tnext.time > timers_wait_until(tnext.time)) {
+			slog("h");
 		//if (timers_wait_until(tnext.time) == 1) {
 			slogn(9,">> Early break\n");
 			// Early break (wait was interrupted). Set this timer up for elimination by any 0-time timers that have come along
@@ -382,7 +394,7 @@ int sled_main(int argc, char** argv) {
 				case 1 :
 					if (lastmod != tnext.moduleno) // not an animation.
 						slogn(9,"Module chose to pass its turn to draw.\n");
-					pick_next(lastmod, udate() + T_MILLISECOND);
+					pick_next(lastmod, oscore_udate() + T_MILLISECOND);
 					break;
 				default :
 					eprintf("Module %s failed to draw: Returned %i", mod->name, ret);
@@ -392,7 +404,8 @@ int sled_main(int argc, char** argv) {
 			}
 		} else {
 			// Virtual null module
-			eprintf(">> using virtual null module\n");
+			//eprintf(">> using virtual null module\n");
+			eprintf("!");
 			asl_clearav(&tnext.args);
 		}
 	}

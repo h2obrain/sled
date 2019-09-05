@@ -212,7 +212,7 @@ static void draw_select(){
 
 int draw(int _modno, int argc, char* argv[]) {
 
-    oscore_time thistick = udate();
+    oscore_time thistick = oscore_udate();
 
     if (__rval==2){
         randomize_and_reset(0);
@@ -255,7 +255,7 @@ int draw(int _modno, int argc, char* argv[]) {
 
 void reset(int _modno) {
     randomize_and_reset(0);
-    nexttick = udate();
+    nexttick = oscore_udate();
 }
 
 int init(int moduleno, char* argstr) {

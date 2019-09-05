@@ -26,9 +26,9 @@
 static oscore_time __earliest_execution_time;
 
 static int check_block() {
-    return (udate() < __earliest_execution_time);
+    return (oscore_udate() < __earliest_execution_time);
 }
 
 static void block_for(int minutes) {
-    __earliest_execution_time = udate() + minutes * 60UL*1000UL*1000UL;
+    __earliest_execution_time = oscore_udate() + minutes * 60UL*1000UL*1000UL;
 }

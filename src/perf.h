@@ -10,15 +10,15 @@ static oscore_time perf_timer[128];
 
 static inline void perf_start(int n) {
 #ifdef PERF
-  perf_timer[n*2] = udate();
+  perf_timer[n*2] = oscore_udate();
   perf_timer[(n*2)+1] = perf_timer[n*2];
 #endif
 }
 
 static inline void perf_print(int n, char* msg) {
 #ifdef PERF
-  oscore_time cur = udate();
+  oscore_time cur = oscore_udate();
   printf("\t%02d: %16lu %16lu - %s\n", n, cur - perf_timer[n*2], cur - perf_timer[(n*2)+1], msg);
-  perf_timer[(n*2)+1] = udate();
+  perf_timer[(n*2)+1] = oscore_udate();
 #endif
 }

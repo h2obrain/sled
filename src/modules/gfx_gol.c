@@ -67,7 +67,7 @@ static void gol_shuffle_board(void) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	gol_shuffle_board();
 	frame = 0;
 }

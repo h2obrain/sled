@@ -262,10 +262,10 @@ static void gol_fader(int cstep) {
 /* main Game of Life control loop. controls whether to reinitialize, calculate the next generation or run the fader. */
 static void gol_loop() {
   // 1024 microseconds or 1000 microseconds per millisecond, where's the difference? ;)
-  oscore_time ms = udate() >> 10;
+  oscore_time ms = oscore_udate() >> 10;
 
   // microsecond overflow protection -- if the gap between ms value and nextrun value is too big, we reset to sensible values.
-  // this might lead to a very short generation time every 71.58278825 minutes, assuming udate works with 32 bit unsigned.
+  // this might lead to a very short generation time every 71.58278825 minutes, assuming oscore_udate works with 32 bit unsigned.
   if( gol_stat.nextrun - ms > GOL_ROUNDTIME_MS ) {
     gol_stat.nextrun = ms;
   }
@@ -307,7 +307,7 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 }
 

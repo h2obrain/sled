@@ -89,7 +89,7 @@ int init(int moduleno, char* argstr) {
 	printf("(output scale for width=%d: %f) ", mx, outputscale);
 
 	modno = moduleno;
-	oscore_time d = udate();
+	oscore_time d = oscore_udate();
 	for( int i = 0; i < runvar_count; i++ ) {
 		runvar[i] = addmod(runvar[i], runmod[i], ((d>>(i/2)) & 0x00FF) / (255/M_PI));
 	}
@@ -97,7 +97,7 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 }
 
@@ -145,7 +145,7 @@ static inline int crossfadei(float amount, int v0, int v1) {
 /* central drawing function
  */
 int draw(int _modno, int argc, char* argv[]) {
-	nexttick = udate() + FRAMETIME;
+	nexttick = oscore_udate() + FRAMETIME;
 	perf_start(modno);
 
 	// compose transformation matrix out of 9 input matrices 

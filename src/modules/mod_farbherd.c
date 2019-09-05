@@ -53,7 +53,7 @@ static void fh_reset(int moduleno) {
 	size_t datasize = farbherd_datasize(priv->hdr.imageHead);
 	if (datasize)
 		memset(priv->buffer, 0, datasize);
-	priv->basetick = udate();
+	priv->basetick = oscore_udate();
 	priv->frame = 0;
 	matrix_clear();
 }

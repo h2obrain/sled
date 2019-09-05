@@ -96,7 +96,7 @@ int draw(int _modno, int argc, char* argv[]) {
 }
 
 void reset(int _modno) {
-    nexttick = udate();
+    nexttick = oscore_udate();
     line = 0;
     matrix_clear();
     rule90_init_line(line);

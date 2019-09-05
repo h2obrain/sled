@@ -115,7 +115,7 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 
     colormode = (randn(10)==0)?1:0;

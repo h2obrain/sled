@@ -113,12 +113,12 @@ static inline float addmodpi(float x, float delta) {
 /*** main drawing loop ***/
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 }
 
 int draw(int _modno, int argc, char* argv[]) {
-	nexttick = udate() + FRAMETIME;
+	nexttick = oscore_udate() + FRAMETIME;
 
 	pangle = addmodpi( pangle, 0.00133 + (angle/256) );
 	angle = cos(pangle) * M_PI;

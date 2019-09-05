@@ -202,7 +202,7 @@ void reset(int _modno) {
 	stack_push(y_stack, y);
 	maze[y * mx + x] = 0; // start cell
 
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 	frame = 0;
 }

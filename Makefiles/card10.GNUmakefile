@@ -31,6 +31,20 @@ CFLAGS += -I${FIRMWARE_HOME}/lib/sdk/Libraries/CMSIS/Device/Maxim/MAX32665/Inclu
 CFLAGS += -I${FIRMWARE_HOME}/lib/sdk/Libraries/CMSIS/Include/
 CFLAGS += -I${FIRMWARE_HOME}/lib/FreeRTOS/Source/portable/GCC/ARM_CM4F/
 
+# CFLAGS
+CFLAGS += -O3
+CFLAGS += -mthumb
+CFLAGS += -mcpu=cortex-m4
+CFLAGS += -mfloat-abi=softfp
+CFLAGS += -mfpu=fpv4-sp-d16
+CFLAGS += -Wa,-mimplicit-it=thumb
+CFLAGS += -ffunction-sections
+CFLAGS += -fdata-sections
+CFLAGS += -fsingle-precision-constant
+CFLAGS += -fno-isolate-erroneous-paths-dereference
+CFLAGS += -ffast-math
+CFLAGS += --specs=nano.specs
+
 # LINK flags
 LDFLAGS += -mthumb
 LDFLAGS += -mcpu=cortex-m4

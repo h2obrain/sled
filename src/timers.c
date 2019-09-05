@@ -15,6 +15,9 @@
 // ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 // OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  
+#include <assert.h>
+#include <inttypes.h>
+
 #include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -22,10 +25,8 @@
 #include <string.h>
 #include "mod.h"
 #include "asl.h"
-#include "oscore.h"
 #include "main.h"
 #include "timers.h"
-#include <assert.h>
 
 static struct timer TIMERS[MAX_TIMERS];
 static int timer_count = 0;
@@ -36,16 +37,18 @@ static oscore_mutex tlock;
 
 static oscore_event breakpipe;
 
-// udate has been replaced by oscore.
+/*
+// oscore_udate has been replaced by oscore.
 // No, this is not pretty.
-oscore_time udate(void) {
+oscore_time oscore_udate(void) {
 	return oscore_udate();
 }
+*/
 
 // The critical wait_until code
 oscore_time timers_wait_until_core(oscore_time desired_usec) {
 	if (oscore_event_wait_until(breakpipe, desired_usec))
-		return udate();
+		return oscore_udate();
 	return desired_usec;
 }
 
@@ -61,6 +64,10 @@ void timers_wait_until_break_core(void) {
 static module *out;
 static int outmodno;
 oscore_time timers_wait_until(oscore_time desired_usec) {
+	slog("udate:%"PRIu32" sleec_until:%"PRIu32"\n",
+			(uint32_t)(oscore_udate()/1000),
+			(uint32_t)((desired_usec)/1000)
+		);
 	return out->wait_until(outmodno, desired_usec);
 }
 
@@ -70,7 +77,6 @@ void timers_wait_until_break(void) {
 }
 
 int timer_add(oscore_time usec,int moduleno, int argc, char* argv[]) {
-	assert(moduleno < mod_count());
 	struct timer t = { .moduleno = moduleno, .time = usec, .args = {argc, argv}};
 
 	oscore_mutex_lock(tlock);

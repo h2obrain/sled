@@ -36,7 +36,7 @@ static float dist(float x0, float y0, float x1, float y1) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	pos = randn(255);
 
 	frame = 0;

@@ -229,7 +229,7 @@ int init(int moduleno, char* argstr) {
 int draw(int _modno, int argc, char ** argv) {
 	if (argc) {
 		opc_mtcountdown = OPC_MTCOUNTDOWN_MAX;
-		opc_mtlastframe = udate();
+		opc_mtlastframe = oscore_udate();
 	}
 	matrix_clear();
 	int indx = 0;

@@ -58,7 +58,7 @@ void reset(int _modno) {
         *p -= (rmin);
     }
     threshold = (rmax-rmin);
-    nexttick = udate();
+    nexttick = oscore_udate();
     matrix_clear();
     interesting = 1;
 }

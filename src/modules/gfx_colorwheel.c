@@ -63,7 +63,7 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 
     for (int i = 0; i < NUM_PARAMETERS; i++){

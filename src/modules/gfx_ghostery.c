@@ -102,12 +102,12 @@ int init(int moduleno, char* argstr) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	frame = 0;
 }
 
 int draw(int _modno, int argc, char* argv[]) {
-	nexttick = udate() + (1000000/30);
+	nexttick = oscore_udate() + (1000000/30);
 	int x;
 	int y;
 	fire_generation();

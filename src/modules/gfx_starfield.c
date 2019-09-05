@@ -112,7 +112,7 @@ void reset(int _modno) {
     for (star_t * star=stars; star < stars + no_of_stars; star++) {
         randomize_star(star);
     }
-    nexttick = udate();
+    nexttick = oscore_udate();
     matrix_clear();
     frame = 0;
 }

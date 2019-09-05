@@ -16,7 +16,7 @@
 
 void random_seed(void) {
 	// Dumbass way of seeding the pseudo RNG.
-	srand(udate());
+	srand(oscore_udate());
 }
 
 uint randn(uint n) {

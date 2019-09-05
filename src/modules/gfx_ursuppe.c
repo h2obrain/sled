@@ -207,7 +207,7 @@ static void update_balls(void) {
 }
 
 void reset(int _modno) {
-	nexttick = udate();
+	nexttick = oscore_udate();
 	matrix_clear();
 	randomize();
 	frame = 0;
