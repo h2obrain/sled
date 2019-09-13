@@ -35,3 +35,6 @@ src/modules/out_ctru_shbin*
 # CLion
 .idea/
 /compile_commands.json
+
+# eclipse garbage
+**/.settings/
