@@ -19,7 +19,6 @@ typedef struct timer {
 } timer;
 
 extern int timers_quitting;
-extern oscore_time oscore_udate(void);
 
 // Generic shared implementation among non-eventloop stuff
 extern oscore_time timers_wait_until_core(oscore_time desired_usec);
