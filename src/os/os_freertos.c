@@ -91,11 +91,20 @@ int oscore_event_wait_until(oscore_event ev, oscore_time desired_usec) {
 	if (diff <= 5000) diff = 5000;
 	*/
 
+	uint32_t cnt=0;
+	while (desired_usec > oscore_udate()) {
+		cnt++;
+		if (!(cnt%10000000)) {
+			slogn(1000, "mdate %"PRIu32"ms\n", oscore_udate()/1000);
+		}
+	}
+	/*
 	TickType_t wait = pdMS_TO_TICKS(diff / 1000);
 	if (wait && (xSemaphoreTake(ev, wait) == pdTRUE)) {
 		slog("INTERRUPT!\n");
 		return 1; // we got an interrupt
 	}
+	*/
 	slog("Timeout.\n");
 	return 0; // timeout
 }

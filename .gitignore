@@ -5,7 +5,7 @@ sledconf
 *.o
 *.so
 /modules
-sled
+/sled
 sled.fish
 
 # libsled
